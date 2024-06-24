@@ -1,55 +1,64 @@
-name: Build Release
+name: Build Repo Listing
 
 on: 
   workflow_dispatch:
+  push:
+    branches: main
+    paths: source.json
 
-env:
-  packageName: "dev.raspichu.inspector-enhancements"
-
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+  
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+  
+env:
+  listPublishDirectory: Website
+  pathToCi: ci
 
 jobs:
-  build:
+  
+  build-listing:
+    name: build-listing
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    
-      - name: Checkout
-        uses: actions/checkout@v3
-    
-      - name: get version
-        id: version
-        uses: notiz-dev/github-action-json-property@7c8cf5cc36eb85d8d287a8086a39dac59628eb31
-        with: 
-            path: "./package.json"
-            prop_path: "version"
-    
-      - name: Set Environment Variables
-        run: |
-          echo "zipFile=${{ env.packageName }}-${{ steps.version.outputs.prop }}".zip >> $GITHUB_ENV
-          echo "unityPackage=${{ env.packageName }}-${{ steps.version.outputs.prop }}.unitypackage" >> $GITHUB_ENV
-        
-      - name: Create Zip
-        uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
+      
+      - uses: actions/checkout@v3 # check out this repo
+      - uses: actions/checkout@v3 # check out automation repo
         with:
-          type: "zip"
-          directory: "."
-          filename: "${{env.zipFile}}"
+          repository: vrchat-community/package-list-action
+          path: ${{env.pathToCi}}
+          clean: false # otherwise the local repo will no longer be checked out
           
-      - run: find "." -name \*.meta >> metaList
+      - name: Restore Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{env.pathToCi}}/.nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
           
-      - name: Create UnityPackage
-        uses: pCYSl5EDgo/create-unitypackage@cfcd3cf0391a5ef1306342794866a9897c32af0b
-        with:
-          package-path: ${{ env.unityPackage }}
-          include-files: metaList
+      - name: Build Package Version Listing
+        run: ${{env.pathToCi}}/build.cmd BuildMultiPackageListing --root ${{env.pathToCi}} --list-publish-directory $GITHUB_WORKSPACE/${{env.listPublishDirectory}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+ 
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
         
-        
-      - name: Make Release
-        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          tag_name: ${{ steps.version.outputs.prop }}
-          files: |
-            ${{ env.zipFile }}
-            ${{ env.unityPackage }}
-            ${{ env.packageName }}/package.json
+          path: ${{env.listPublishDirectory}}
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
