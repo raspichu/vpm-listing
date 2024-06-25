@@ -14,6 +14,7 @@
     },
     "bannerUrl":"banner.png",
     "githubRepos":[
-        "raspichu/VRC-Inspector-Enhancements"
+        "raspichu/VRC-Inspector-Enhancements",
+        "raspichu/VRC-Unused-Bone-Remove"
     ]
 }
