@@ -1,20 +1,28 @@
 {
-    "name":"Pichu packages",
-    "id":"dev.raspichu.vpm",
-    "url":"https://raspichu.github.io/vpm-listing/index.json",
+    "name":"Example Listing",
+    "id":"com.vrchat.example-listing",
+    "url":"https://vrchat-community.github.io/template-package-listing/index.json",
     "author":{
-        "email":"pichu@users.noreply.github.com",
-        "name":"Pichu",
-        "url":"https://raspichu.moe"
+        "email":"developer@vrchat.com",
+        "name":"VRChat",
+        "url":"https://hello.vrchat.com"
     },
-    "description":"Pichu listing of VRChat packages",
+    "description":"Example listing of VRChat packages",
     "infoLink":{
-        "url":"https://github.com/raspichu/vpm-listing/",
+        "url":"http://github.com/vrchat-community/template-package-listing",
         "text":"View on GitHub"
     },
     "bannerUrl":"banner.png",
     "githubRepos":[
-        "raspichu/VRC-Inspector-Enhancements",
-        "raspichu/VRC-tools"
+        "vrchat-community/clientsim"
+    ],
+    "packages":[
+        {
+            "name":"com.vrchat.udonsharp",
+            "releases":[
+                "https://github.com/vrchat-community/UdonSharp/releases/download/1.1.7/com.vrchat.UdonSharp.zip",
+                "https://github.com/vrchat-community/UdonSharp/releases/download/1.1.6/com.vrchat.UdonSharp-1.1.6.zip"
+            ]
+        }
     ]
 }
